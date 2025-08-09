@@ -1,0 +1,97 @@
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: auth-service
+        url: /v3/api-docs/auth
+      - name: user-service
+        url: /v3/api-docs/user
+      - name: leave-request-service
+        url: /v3/api-docs/leave
+
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5s
+      default-filters:
+        - name: PreserveHostHeader
+
+      routes:
+        # ===================== LEAVE REQUEST SERVICE =====================
+        - id: leave-request-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/leaves/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+
+        # Forward leave-request-service docs
+        - id: leave-request-docs
+          uri: http://localhost:8083
+          predicates:
+            - Path=/v3/api-docs/leave
+          filters:
+            - RewritePath=/v3/api-docs/leave(?<segment>/?.*), /v3/api-docs${segment}
+
+        # ===================== AUTH SERVICE =====================
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+
+        # Forward auth-service docs
+        - id: auth-docs
+          uri: http://localhost:8081
+          predicates:
+            - Path=/v3/api-docs/auth
+          filters:
+            - RewritePath=/v3/api-docs/auth(?<segment>/?.*), /v3/api-docs${segment}
+
+        # ===================== USER SERVICE =====================
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/users/**, /employee/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+
+        # Forward user-service docs
+        - id: user-docs
+          uri: http://localhost:8082
+          predicates:
+            - Path=/v3/api-docs/user, /v3/api-docs/user/**
+          filters:
+            - RewritePath=/v3/api-docs/user(?<segment>/?.*), /v3/api-docs${segment}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: mySecretKey
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

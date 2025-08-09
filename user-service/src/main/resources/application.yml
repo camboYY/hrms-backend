@@ -1,0 +1,28 @@
+server:
+  port: 8082
+
+spring:
+  application:
+  name: user-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/hrms_userdb
+    username: myuser
+    password: mypassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # can be validate / update / create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always   # run schema/data.sql on startup if present
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
