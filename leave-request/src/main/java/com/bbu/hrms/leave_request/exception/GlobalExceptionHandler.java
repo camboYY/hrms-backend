@@ -19,6 +19,46 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body); // 404 Not found
     }
 
+    @ExceptionHandler(LeaveTypeSettingExistsException.class)
+    public ResponseEntity<Map<String, String>> handleLeaveTypeSettingExistsException(LeaveTypeSettingExistsException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "LEAVE_TYPE_SETTING_EXISTS");
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body); // 409 Conflict
+    }
+
+    @ExceptionHandler(LeaveBalanceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleLeaveBalanceNotFoundException(LeaveBalanceNotFoundException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "LEAVE_BALANCE_NOT_FOUND");
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body); // 404 Not found
+    }
+
+    @ExceptionHandler(LeaveTypeSettingNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleLeaveTypeSettingNotFoundException(LeaveTypeSettingNotFoundException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "LEAVE_TYPE_SETTING_NOT_FOUND");
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body); // 404 Not found
+    }
+
+    @ExceptionHandler(InsufficientLeaveBalanceException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientLeaveBalanceException(InsufficientLeaveBalanceException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "INSUFFICIENT_LEAVE_BALANCE");
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body); // 403 Forbidden
+    }
+
+    @ExceptionHandler(InvalidLeaveTypeException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidLeaveTypeException(InvalidLeaveTypeException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "INVALID_LEAVE_TYPE");
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body); // 400 Bad Request
+    }
+
     @ExceptionHandler(NotAuthorizedToCancelLeaveException.class)
     public ResponseEntity<Map<String, String>> handleNotAuthorizedToCancelLeaveException(NotAuthorizedToCancelLeaveException ex) {
         Map<String, String> body = new HashMap<>();

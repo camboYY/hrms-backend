@@ -1,17 +1,18 @@
 package com.bbu.hrms.auth_service.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 👈 important
     private Long id;
 
     @Column(unique = true)
@@ -22,24 +23,62 @@ public class User {
 
     private String password;
 
-    private String roles; // comma-separated: "ROLE_USER,ROLE_ADMIN"
+    @Column(name = "status")
+    private String status = "ACTIVE"; // active or inactive
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     // Getters and setters
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setRoles(String roles) {
-        this.roles = roles;
+    public Long getId() {
+        return id;
     }
 
     public void setUsername(String username) {
@@ -50,20 +89,12 @@ public class User {
         return username;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPassword() {
         return password;
-    }
-
-    public String getRoles() {
-        return roles;
     }
 
 }

@@ -11,9 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -43,7 +43,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
@@ -60,7 +60,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
       return ResponseEntity.ok().body(authService.register(request));
     }
 
@@ -73,7 +73,7 @@ public class AuthController {
      */
     @Operation(summary = "Refresh JWT token", description = "Generate a new JWT token using refresh token")
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshJwtToken(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<AuthResponse> refreshJwtToken( @Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authService.refreshJwtToken(request));
     }
 
@@ -87,7 +87,7 @@ public class AuthController {
     @Operation(summary = "Get current user", description = "Fetch the currently logged-in user info using JWT token")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<UserResponse> getCurrentUser(HttpServletRequest request) {
         return ResponseEntity.ok(authService.getCurrentUser(request));
     }
 
@@ -136,10 +136,4 @@ public class AuthController {
         return ResponseEntity.ok(authService.resetPassword(body));
     }
 
-    @PutMapping("/change-roles")
-    @Operation(summary = "Change user roles", description = "Change user roles")
-    public ResponseEntity<?> changeUserRoles(@Validated @RequestBody ChangeUserRoleRequest request) {
-        authService.updateUserRoles(request.getUserId(), request.getNewRoles());
-        return ResponseEntity.ok(Map.of("message", "User roles updated successfully"));
-    }
 }

@@ -15,7 +15,7 @@ spring:
     name: auth-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydatabase
+    url: jdbc:postgresql://localhost:5432/hrms_userAuthDB
     username: myuser
     password: mypassword
     driver-class-name: org.postgresql.Driver

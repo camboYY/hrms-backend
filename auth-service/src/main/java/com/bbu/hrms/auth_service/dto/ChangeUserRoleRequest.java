@@ -1,12 +1,14 @@
 package com.bbu.hrms.auth_service.dto;
 
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.util.Set;
 
 public class ChangeUserRoleRequest {
-    @NotEmpty(message = "User ID is required")
+    @NotNull(message = "User ID is required")
+    @Positive(message = "User ID must be positive")
     private Long userId;
 
     private Set<String> newRoles; // e.g. ["ROLE_ADMIN", "ROLE_MANAGER"]

@@ -6,24 +6,31 @@ import com.bbu.hrms.auth_service.exception.InvalidTokenException;
 import com.bbu.hrms.auth_service.exception.NewPasswordRequiredException;
 import com.bbu.hrms.auth_service.exception.UserNotFoundException;
 import com.bbu.hrms.auth_service.exception.UsernameAlreadyTakenException;
+import com.bbu.hrms.auth_service.mapper.UserMapper;
+import com.bbu.hrms.auth_service.model.Role;
 import com.bbu.hrms.auth_service.model.User;
+import com.bbu.hrms.auth_service.repository.RoleRepository;
 import com.bbu.hrms.auth_service.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 public class AuthService {
+    private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     @Autowired private UserRepository userRepo;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
+    @Autowired private RoleRepository roleRepository;
 
     /**
      * Handles login requests.
@@ -33,29 +40,25 @@ public class AuthService {
      *         {@link RuntimeException} if the username or password is invalid
      */
     public AuthResponse login(AuthRequest req) {
-        User user = userRepo.findByUsername(req.username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-        if (!passwordEncoder.matches(req.password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+        User user = userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if(!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+            throw new InvalidTokenException("Invalid credentials");
         }
 
         String accessToken = jwtUtil.generateToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getId(),
+                user.getRoles().stream().map(Role::getName).toList()
+        );
     }
 
-    public void updateUserRoles(Long userId, Set<String> newRoles) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        String rolesString = newRoles.stream()
-                .map(String::trim)
-                .collect(Collectors.joining(","));
-
-        user.setRoles(rolesString);
-        userRepo.save(user);
-    }
 
     /**
      * Handles registration requests.
@@ -63,17 +66,34 @@ public class AuthService {
      * @param req the {@link RegisterRequest} containing the user details
      * @throws UsernameAlreadyTakenException if the username is already taken
      */
-    public RegisterResponse register(RegisterRequest req) {
-        if (userRepo.existsByUsername(req.username)) {
-            throw new UsernameAlreadyTakenException(req.username);
+    public AuthResponse register(RegisterRequest req) {
+        if(userRepo.findByUsername(req.username()).isPresent()) {
+            throw new UsernameAlreadyTakenException("Username already exists");
         }
+
         User user = new User();
-        user.setUsername(req.username);
-        user.setPassword(passwordEncoder.encode(req.password));
-        user.setRoles(req.roles);
-        user.setEmail(req.email);
-       return new RegisterResponse("User registered successfully", userRepo.save(user).getId());
+        user.setUsername(req.username());
+        user.setEmail(req.email());
+        user.setStatus("ACTIVE");
+        user.setPassword(passwordEncoder.encode(req.password()));
+
+        // assign default EMPLOYEE role
+        Role defaultRole = roleRepository.findByName("EMPLOYEE").orElseThrow(()-> new RuntimeException("Default role not found"));
+        user.getRoles().add(defaultRole);
+
+        userRepo.save(user);
+
+        String accessToken = jwtUtil.generateToken(user);
+        String refreshToken = jwtUtil.generateRefreshToken(user);
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getId(),
+                user.getRoles().stream().map(Role::getName).toList()
+        );
     }
+
 
     /**
      * Refreshes a JWT token.
@@ -99,8 +119,12 @@ public class AuthService {
             String accessToken = jwtUtil.generateToken(user.get());
             String refreshToken = jwtUtil.generateRefreshToken(user.get());
 
-            return new AuthResponse(accessToken, refreshToken);
-        } catch (Exception e) {
+            return new AuthResponse(
+                    accessToken,
+                    refreshToken,
+                    user.get().getId(),
+                    user.get().getRoles().stream().map(Role::getName).toList()
+            );        } catch (Exception e) {
             throw new InvalidTokenException("Invalid or expired token");
         }
     }
@@ -112,7 +136,7 @@ public class AuthService {
      * @return a {@link Map} containing the user's username and roles if the token is valid, or a
      *         {@link MessageResponse} explaining the error if the token is invalid or expired
      */
-    public Object getCurrentUser(HttpServletRequest request) {
+    public UserResponse getCurrentUser(HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         if (token == null) {
             throw new InvalidTokenException("Token missing");
@@ -121,10 +145,11 @@ public class AuthService {
             Claims claims = jwtUtil.parseClaims(token);
             String username = claims.getSubject();
             Optional<User> user = userRepo.findByUsername(username);
-            return user.<Object>map(value -> Map.of(
-                    "username", value.getUsername(),
-                    "roles", value.getRoles()
-            )).orElseGet(() -> new UserNotFoundException("User not found"));
+            if (user.isEmpty()) {
+                throw new UserNotFoundException("User not found for token user");
+            }
+
+            return user.map(UserMapper::toResponse).orElseThrow(() -> new UserNotFoundException("User not found for token user"));
             // Don't send password or sensitive info
         } catch (Exception e) {
             throw new InvalidTokenException("Invalid token");

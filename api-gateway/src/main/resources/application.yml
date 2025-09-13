@@ -28,7 +28,7 @@ spring:
         - id: leave-request-service
           uri: http://localhost:8083
           predicates:
-            - Path=/leaves/**
+            - Path=/leaves/**, /leave-types/**, /leave-balances/**
           filters:
             - name: RequestRateLimiter
               args:
@@ -48,7 +48,7 @@ spring:
         - id: auth-service
           uri: http://localhost:8081
           predicates:
-            - Path=/auth/**
+            - Path=/auth/**, /users/**, /roles/**, /permissions/**
           filters:
             - name: RequestRateLimiter
               args:
@@ -68,7 +68,7 @@ spring:
         - id: user-service
           uri: http://localhost:8082
           predicates:
-            - Path=/users/**, /employee/**
+            - Path=/departments/**, /employees/**, /positions/**
           filters:
             - name: RequestRateLimiter
               args:

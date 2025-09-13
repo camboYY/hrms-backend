@@ -1,9 +1,6 @@
 package com.bbu.hrms.user_service.dto;
 
 
-import java.util.Set;
-
-
 public class UserDto {
     private Long id;
     private String username;
@@ -12,14 +9,13 @@ public class UserDto {
     private String lastName;
     private String phoneNumber;
     private String status;
-    private Set<String> roles; // role names
     private Long authUserId;
-
+    private Long managerId;
 
     public UserDto() {
 
     }
-    public UserDto( Long id,  String username,  String email, String firstName, String lastName, String phoneNumber, String status, Set<String> roles, Long authUserId) {
+    public UserDto( Long id,  String username,  String email, String firstName, String lastName, String phoneNumber, String status, Long authUserId , Long managerId) {
         this.firstName = firstName;
         this.id = id;
         this.username = username;
@@ -27,8 +23,16 @@ public class UserDto {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.status = status;
-        this.roles = roles;
         this.authUserId = authUserId;
+        this.managerId = managerId;
+    }
+
+    public Long getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
     }
 
     public Long getAuthUserId() {
@@ -95,13 +99,6 @@ public class UserDto {
         this.status = status;
     }
 
-    public Set<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
-    }
 
 }
 
