@@ -15,5 +15,7 @@ public class PositionDTO {
 
     @NotNull(message = "Department is required")
     private Long departmentId;
+
+    private String departmentName;
 }
 

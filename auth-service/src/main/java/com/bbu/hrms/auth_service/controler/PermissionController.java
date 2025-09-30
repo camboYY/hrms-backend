@@ -34,4 +34,19 @@ public class PermissionController {
         p.setName(req.name());
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponse(repo.save(p)));
     }
+
+    @Operation(summary = "Delete a permission")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Update a permission")
+    @PutMapping("/{id}")
+    public ResponseEntity<PermissionResponse> update(@PathVariable Long id, @RequestBody PermissionRequest req) {
+        Permission p = repo.findById(id).orElseThrow();
+        p.setName(req.name());
+        return ResponseEntity.ok(UserMapper.toResponse(repo.save(p)));
+    }
 }

@@ -29,6 +29,7 @@ public class PositionController {
         dto.setTitle(p.getName());
         dto.setDescription(p.getDescription());
         dto.setDepartmentId(p.getDepartment().getId());
+        dto.setDepartmentName(p.getDepartment().getName());
         return dto;
     }
 

@@ -3,15 +3,17 @@ package com.bbu.hrms.auth_service.controler;
 import com.bbu.hrms.auth_service.dto.UserRequest;
 import com.bbu.hrms.auth_service.dto.UserResponse;
 import com.bbu.hrms.auth_service.dto.UserRoleRequest;
+import com.bbu.hrms.auth_service.helper.PagedResponse;
 import com.bbu.hrms.auth_service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -22,31 +24,43 @@ public class UserController {
 
     @Operation(summary = "Get all users")
     @GetMapping
-    public ResponseEntity<List<UserResponse>> list() { return ResponseEntity.ok().body(service.all()); }
+    public ResponseEntity<PagedResponse<UserResponse>> list(@RequestParam(defaultValue = "0") Integer page,
+                                                            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserResponse> pageResult = service.all(pageable);
+
+        return ResponseEntity.ok().body(new PagedResponse<UserResponse>(
+                pageResult.getContent(),
+                pageResult.getNumber(),
+                pageResult.getSize(),
+                pageResult.getTotalElements(),
+                pageResult.getTotalPages(),
+                pageResult.isLast()));
+    }
 
     @Operation(summary = "Get user by id")
     @GetMapping("/{id}")
-    public  ResponseEntity<UserResponse> get(@PathVariable Long id) { return ResponseEntity.ok().body(service.get(id)); }
+    public  ResponseEntity<UserResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok().body(service.get(id));
+    }
 
     @Operation(summary = "Create a new user")
     @PostMapping
-    public ResponseEntity<UserResponse> create(@RequestBody @Valid UserRequest u) { return ResponseEntity.ok().body(service.create(u)); }
+    public ResponseEntity<UserResponse> create(@RequestBody @Valid UserRequest u) {
+        return ResponseEntity.ok().body(service.create(u));
+    }
 
     @Operation(summary = "Update a user")
     @PutMapping("/{id}")
-    public  ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UserRequest u) { return ResponseEntity.ok().body(service.update(id, u)); }
+    public  ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UserRequest u) {
+        return ResponseEntity.ok().body(service.update(id, u));
+    }
 
     @Operation(summary = "Delete a user")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Assign role to user")
-    @PutMapping("/{userId}/roles/{roleId}")
-    public ResponseEntity<UserResponse> assignRole(Long userId, Long roleId) {
-        return ResponseEntity.ok().body(service.assignRole(userId, roleId));
     }
 
     @Operation(summary = "Assign role to user")

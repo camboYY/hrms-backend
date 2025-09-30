@@ -29,4 +29,10 @@ public interface EmployeeServiceInterface {
     List<EmployeeDocumentDTO> listDocuments(Long employeeId);
     EmployeeDocumentDTO addDocument(EmployeeDocumentDTO dto);
     void deleteDocument(Long id);
+
+    Long count();
+
+    List<EmployeeDTO> getEmployeesByPosition(Long positionId);
+
+    List<EmployeeDTO> searchByNameOrPosition(String query);
 }

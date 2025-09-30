@@ -24,4 +24,8 @@ public interface LeaveService {
     // Leave Balances
     LeaveBalanceDTO allocateLeave(LeaveBalanceDTO dto);
     LeaveBalanceDTO getBalance(Long employeeId, Long leaveTypeId);
+
+    LeaveRequestDTO cancelRequest(Long id);
+
+    List<LeaveRequestDTO> getRecentRequests(Long employeeId);
 }

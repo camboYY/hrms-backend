@@ -4,6 +4,7 @@ import com.bbu.hrms.auth_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -40,4 +41,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if a user exists with the given email address, false otherwise
      */
     boolean existsByEmail(String email);
+
+    List<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email);
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -134,6 +135,12 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest body) {
         return ResponseEntity.ok(authService.resetPassword(body));
+    }
+
+    @Operation(summary = "Search user by username or email", description = "List all users in the system")
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponse>> listUsers(@RequestParam String query) {
+        return ResponseEntity.ok(authService.listUsers(query));
     }
 
 }

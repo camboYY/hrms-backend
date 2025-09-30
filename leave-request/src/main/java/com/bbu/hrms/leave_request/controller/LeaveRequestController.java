@@ -65,6 +65,18 @@ public class LeaveRequestController {
         return ResponseEntity.ok(service.listRequests(employeeId));
     }
 
+    @Operation(summary = "Cancel leave request")
+    @PostMapping("/requests/{id}/cancel")
+    public ResponseEntity<LeaveRequestDTO> cancel(@PathVariable Long id) {
+        return ResponseEntity.ok(service.cancelRequest(id));
+    }
+
+    @Operation(summary = "Get recent leave requests for an employee")
+    @GetMapping("/requests/recent")
+    public ResponseEntity<List<LeaveRequestDTO>> getRecentRequests(@RequestParam Long employeeId) {
+        return ResponseEntity.ok(service.getRecentRequests(employeeId));
+    }
+
     // --- Leave Balances ---
     @Operation(summary = "Allocate leave balance for an employee")
     @PostMapping("/balances")

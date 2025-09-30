@@ -43,23 +43,23 @@ public class DepartmentController {
 
     @Operation(summary = "Create department")
     @PostMapping("/")
-    public ResponseEntity<String> createDepartment(@Validated @RequestBody CreateDepartmentRequest request) {
+    public ResponseEntity<MessageResponse> createDepartment(@Validated @RequestBody CreateDepartmentRequest request) {
         departmentService.createDepartment(request);
-        return ResponseEntity.ok().body("Department created successfully");
+        return ResponseEntity.ok().body(new MessageResponse("Department created successfully"));
     }
 
     @Operation(summary = "Update department")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateDepartment(@PathVariable Long id, @Validated @RequestBody UpdateDepartmentRequest request) {
+    public ResponseEntity<MessageResponse> updateDepartment(@PathVariable Long id, @Validated @RequestBody UpdateDepartmentRequest request) {
         departmentService.updateDepartment(id, request);
-        return ResponseEntity.ok().body("Department updated successfully");
+        return ResponseEntity.ok().body(new MessageResponse("Department updated successfully"));
     }
 
     @Operation(summary = "Delete department")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);
-        return ResponseEntity.ok().body("Department deleted successfully");
+        return ResponseEntity.ok().body(new MessageResponse("Department deleted successfully"));
     }
 
     @Operation(summary = "Get all departments paginated")

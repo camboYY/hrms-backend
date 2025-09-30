@@ -99,6 +99,18 @@ public class LeaveServiceImpl implements LeaveService {
         return leaveRequestRepo.findByEmployeeId(employeeId).stream().map(this::toDTO).toList();
     }
 
+    @Override
+    public LeaveRequestDTO cancelRequest(Long requestId) {
+        LeaveRequest req = leaveRequestRepo.findById(requestId).orElseThrow();
+        req.setStatus(LeaveStatus.CANCELLED);
+        return toDTO(req);
+    }
+
+    @Override
+    public List<LeaveRequestDTO> getRecentRequests(Long employeeId) {
+        return leaveRequestRepo.findByEmployeeId(employeeId).stream().limit(5).map(this::toDTO).toList();
+    }
+
     // --- Leave Balances ---
     @Override
     public LeaveBalanceDTO allocateLeave(LeaveBalanceDTO dto) {

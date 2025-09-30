@@ -20,8 +20,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -238,6 +240,11 @@ public class AuthService {
         userRepo.save(user.get());
 
         return new MessageResponse("Password reset successfully");
+    }
+
+    public List<UserResponse> listUsers(String query) {
+        List<User> users = userRepo.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query);
+        return users.stream().map(UserMapper::toResponse).collect(Collectors.toList());
     }
 }
 

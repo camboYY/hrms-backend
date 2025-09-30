@@ -1,6 +1,7 @@
 package com.bbu.hrms.auth_service.service;
 
 
+import com.bbu.hrms.auth_service.dto.RolePermissionRequest;
 import com.bbu.hrms.auth_service.dto.RoleRequest;
 import com.bbu.hrms.auth_service.dto.RoleResponse;
 import com.bbu.hrms.auth_service.mapper.UserMapper;
@@ -11,6 +12,7 @@ import com.bbu.hrms.auth_service.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -42,5 +44,18 @@ public class RoleService {
     public List<RoleResponse> findAll() {
         return roleRepo.findAll().stream()
                 .map(UserMapper::toResponse).toList();
+    }
+
+    public List<RoleResponse> assignPermissionsToRole(Long roleId, RolePermissionRequest[] requests) {
+        Role role = roleRepo.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
+        for (RolePermissionRequest request : requests) {
+            Permission perm = permRepo.findById(request.permissionId()).orElseThrow(() -> new RuntimeException("Permission not found"));
+            role.getPermissions().add(perm);
+        }
+        return Collections.singletonList(UserMapper.toResponse(roleRepo.save(role)));
+    }
+
+    public void remove(Long id) {
+        roleRepo.deleteById(id);
     }
 }

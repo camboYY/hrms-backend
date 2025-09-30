@@ -28,6 +28,21 @@ public class RoleController {
         return ResponseEntity.ok(roleService.assignPermissionToRole(roleId, request.permissionId()));
     }
 
+    @Operation(summary = "Assign multiple permissions to role")
+    @PostMapping("/{roleId}/permissions/batch")
+    public ResponseEntity<List<RoleResponse>> assignPermissions(
+            @PathVariable Long roleId,
+            @RequestBody RolePermissionRequest[] requests) {
+        return ResponseEntity.ok(roleService.assignPermissionsToRole(roleId, requests));
+    }
+
+    @Operation(summary = "Remove role")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
+        roleService.remove(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "Remove permission from role")
     @DeleteMapping("/{roleId}/permissions/{permId}")
     public ResponseEntity<RoleResponse> removePermission(

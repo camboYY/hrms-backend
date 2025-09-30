@@ -46,6 +46,9 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
         d.setPositionId(e.getPosition() != null ? e.getPosition().getId() : null);
         d.setManagerId(e.getManager() != null ? e.getManager().getId() : null);
         d.setStatus(e.getStatus());
+        d.setDepartmentName(e.getDepartment() != null ? e.getDepartment().getName() : null);
+        d.setPositionName(e.getPosition() != null ? e.getPosition().getName() : null);
+        d.setManagerName(e.getManager() != null ? e.getManager().getFirstName() + " " + e.getManager().getLastName() : null);
         return d;
     }
 
@@ -171,6 +174,17 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
     }
 
     @Override
+    public List<EmployeeDTO> getEmployeesByPosition(Long positionId) {
+        List<Employee> employees = employeeRepo.findByPositionId(positionId);
+        return employees.stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public List<EmployeeDTO> searchByNameOrPosition(String query) {
+        return employeeRepo.searchByNameOrPosition(query).stream().map(this::toDTO).toList();
+    }
+
+    @Override
     public void deleteContact(Long id) { contactRepo.deleteById(id); }
 
     @Override @Transactional(readOnly = true)
@@ -190,4 +204,9 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
 
     @Override
     public void deleteDocument(Long id) { documentRepo.deleteById(id); }
+
+    @Override
+    public Long count() {
+        return employeeRepo.countByStatus(EmployeeStatus.ACTIVE);
+    }
 }

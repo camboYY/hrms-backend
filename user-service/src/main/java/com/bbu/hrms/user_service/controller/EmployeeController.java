@@ -55,6 +55,24 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get total number of active employees")
+    @GetMapping("/count")
+    public ResponseEntity<Long> count() {
+        return ResponseEntity.ok(service.count());
+    }
+
+    @Operation(summary = "Fetch employees by p")
+    @GetMapping("/position/{positionId}")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByPosition(@PathVariable Long positionId) {
+        return ResponseEntity.ok(service.getEmployeesByPosition(positionId));
+    }
+
+    @Operation(summary = "Search employees by name or position")
+    @GetMapping("/search")
+    public ResponseEntity<List<EmployeeDTO>> searchByNameOrPosition(@RequestParam String query) {
+        return ResponseEntity.ok(service.searchByNameOrPosition(query));
+    }
+
     @Operation(summary = "List employees with pagination and optional status filter")
     @GetMapping
     public ResponseEntity<PagedResponse<EmployeeDTO>> list(

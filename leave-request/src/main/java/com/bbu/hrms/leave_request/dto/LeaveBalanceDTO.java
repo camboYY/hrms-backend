@@ -21,6 +21,8 @@ public class LeaveBalanceDTO {
     private Integer usedDays;
     private Integer remainingDays;
 
+    private String employeeName;
+
     public static LeaveBalanceDTO fromEntity(LeaveBalance entity) {
         return LeaveBalanceDTO.builder().id(entity.getId())
                 .employeeId(entity.getEmployeeId())

@@ -8,6 +8,8 @@ import com.bbu.hrms.auth_service.model.User;
 import com.bbu.hrms.auth_service.repository.RoleRepository;
 import com.bbu.hrms.auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +20,8 @@ public class UserService {
     private final UserRepository repo;
     private final RoleRepository roleRepo;
 
-    public List<UserResponse> all() {
-        return repo.findAll().stream()
-                .map(UserMapper::toResponse)
-                .toList();
+    public Page<UserResponse> all(Pageable pageable) {
+        return repo.findAll(pageable).map(UserMapper::toResponse);
     }
 
     public UserResponse get(Long id) {

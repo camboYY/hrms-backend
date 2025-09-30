@@ -39,6 +39,8 @@ public class EmployeeDTO {
     private Long positionId;   // optional
     private Long managerId;    // nullable
 
+    private String positionName;
+
     @NotNull(message = "Status is required")
     private EmployeeStatus status;
 

@@ -1,5 +1,7 @@
 package com.bbu.hrms.leave_request.service;
 
+import com.bbu.hrms.leave_request.client.EmployeeClient;
+import com.bbu.hrms.leave_request.dto.EmployeeResponse;
 import com.bbu.hrms.leave_request.dto.LeaveBalanceDTO;
 import com.bbu.hrms.leave_request.exception.LeaveBalanceNotFoundException;
 import com.bbu.hrms.leave_request.model.LeaveBalance;
@@ -74,6 +76,8 @@ public class LeaveBalanceService {
         entity.setEmployeeId(req.getEmployeeId());
         entity.setLeaveType(leaveTypeSetting);
         entity.setRemainingDays(req.getRemainingDays());
+        entity.setAllocatedDays(req.getAllocatedDays());
+        entity.setUsedDays(req.getUsedDays());
         return entity;
     }
 }

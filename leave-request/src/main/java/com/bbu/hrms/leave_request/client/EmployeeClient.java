@@ -17,4 +17,6 @@ public interface EmployeeClient {
     @GetMapping("/employee/manager/{managerId}/employees")
     List<EmployeeResponse> getEmployeesByManager(@PathVariable("managerId") Long managerId);
 
+    @GetMapping("/employees/{id}")
+    EmployeeResponse getEmployeeById(@PathVariable("id") Long id);
 }
