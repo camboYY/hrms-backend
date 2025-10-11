@@ -1,5 +1,6 @@
 package com.bbu.hrms.user_service.controller;
 
+import com.bbu.hrms.user_service.client.LeaveFeignClient;
 import com.bbu.hrms.user_service.dto.*;
 import com.bbu.hrms.user_service.model.EmployeeStatus;
 import com.bbu.hrms.user_service.service.EmployeeServiceInterface;
@@ -24,8 +25,8 @@ public class EmployeeController {
     private final EmployeeServiceInterface service;
 
     @Operation(summary = "fetch employees under a manager supervision")
-    @GetMapping("/manager/{managerId}/employees")
-    public ResponseEntity<List<EmployeeResponse>> getEmployeesByManager(
+    @GetMapping("/{managerId}/pending-leaves")
+    public ResponseEntity<List<LeaveRequestDTO>> getEmployeesByManager(
             @PathVariable Long managerId) {
         return ResponseEntity.ok(service.getEmployeesByManager(managerId));
     }

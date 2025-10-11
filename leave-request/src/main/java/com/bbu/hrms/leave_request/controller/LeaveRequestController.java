@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -92,23 +91,14 @@ public class LeaveRequestController {
     }
 
     // --- Leave Requests for Manager ---
-    @GetMapping("/{managerId}/pending-leave-requests")
-    public ResponseEntity<List<LeaveRequestDTO>> getPendingLeaveRequests(
-            @PathVariable Long managerId) {
-        List<LeaveRequest> requests = service.getPendingRequestsForManager(managerId);
-        List<LeaveRequestDTO> dtos = new ArrayList<>();
-        requests.forEach(request -> {
-            LeaveRequestDTO dto = new LeaveRequestDTO();
-            dto.setEmployeeId(request.getId());
-            dto.setLeaveTypeId(request.getLeaveType().getId());
-            dto.setStartDate(request.getStartDate());
-            dto.setEndDate(request.getEndDate());
-            dto.setReason(request.getReason());
-            dto.setStatus(request.getStatus());
-            dtos.add(dto);
-        });
 
-        return ResponseEntity.ok(dtos);
+    // Example: GET /api/leaves?employeeIds=1,2,3&status=PENDING
+    @GetMapping
+    public List<LeaveRequestDTO> getLeaves(
+            @RequestParam(required = false, name = "employeeIds") List<Long> employeeIds,
+            @RequestParam(required = false) String status
+    ) {
+        return service.getByEmployeeIdsAndStatus(employeeIds, status);
     }
 }
 

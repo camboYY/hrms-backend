@@ -13,8 +13,6 @@ public interface LeaveService {
     LeaveTypeDTO createLeaveType(LeaveTypeDTO dto);
     List<LeaveTypeDTO> listLeaveTypes();
 
-    List<LeaveRequest> getPendingRequestsForManager(Long managerId);
-
     // Leave Requests
     LeaveRequestDTO requestLeave(LeaveRequestDTO dto);
     LeaveRequestDTO approveLeave(Long requestId, Long approverId);
@@ -28,4 +26,6 @@ public interface LeaveService {
     LeaveRequestDTO cancelRequest(Long id);
 
     List<LeaveRequestDTO> getRecentRequests(Long employeeId);
+
+    List<LeaveRequestDTO> getByEmployeeIdsAndStatus(List<Long> employeeIds, String status);
 }

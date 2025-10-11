@@ -12,11 +12,13 @@ import com.bbu.hrms.leave_request.repository.LeaveRequestRepository;
 import com.bbu.hrms.leave_request.repository.LeaveTypeRepository;
 import com.bbu.hrms.leave_request.service.LeaveService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class LeaveServiceImpl implements LeaveService {
     private final LeaveTypeRepository leaveTypeRepo;
     private final LeaveRequestRepository leaveRequestRepo;
     private final LeaveBalanceRepository leaveBalanceRepo;
-    private final EmployeeClient employeeClient;
+    private final Logger logger = getLogger(LeaveServiceImpl.class);
 
     // --- Leave Types ---
     @Override
@@ -148,15 +150,26 @@ public class LeaveServiceImpl implements LeaveService {
         return dto;
     }
 
-    public List<LeaveRequest> getPendingRequestsForManager(Long managerId) {
-        // Step 1: Get employees under manager
-        List<EmployeeResponse> employees = employeeClient.getEmployeesByManager(managerId);
+    public List<LeaveRequestDTO> getByEmployeeIdsAndStatus(List<Long> employeeIds, String status) {
+        logger.info("Getting leave requests for employeeIds: {}, status: {}", employeeIds, status);
+        if (employeeIds == null || employeeIds.isEmpty()) return List.of();
+        LeaveStatus leaveStatus = LeaveStatus.valueOf(status.toUpperCase()); // "PENDING" -> LeaveStatus.PENDING
 
-        List<Long> employeeIds = employees.stream()
-                .map(EmployeeResponse::getId)
-                .collect(Collectors.toList());
+        List<LeaveRequest> leaves = leaveRequestRepo.findByEmployeeIdsAndStatus(employeeIds, leaveStatus);
 
-        // Step 2: Fetch leave requests by employeeIds with PENDING status
-        return leaveRequestRepo.findByEmployeeIdInAndStatus(employeeIds, LeaveStatus.PENDING);
+        // Map entities to DTOs
+        return leaves.stream()
+                .map(l -> {
+                    LeaveRequestDTO dto = new LeaveRequestDTO();
+                    dto.setId(l.getId());
+                    dto.setEmployeeId(l.getEmployeeId()); // only basic info
+                    dto.setLeaveTypeId(l.getLeaveType().getId());
+                    dto.setStartDate(l.getStartDate());
+                    dto.setEndDate(l.getEndDate());
+                    dto.setReason(l.getReason());
+                    dto.setStatus(l.getStatus());
+                    dto.setApproverId(l.getApproverId() != null ? l.getApproverId() : null);
+                    return dto;
+                }).toList();
     }
 }

@@ -23,25 +23,25 @@ public class UserMapper {
 
     public static User toEntity(UserRequest request) {
         User u = new User();
-        u.setUsername(request.username());
-        u.setEmail(request.email());
-        u.setStatus(request.status());
-        u.setPassword(request.password());
+        u.setUsername(request.getUsername());
+        u.setEmail(request.getEmail());
+        u.setStatus(request.getStatus());
+        u.setPassword(request.getPassword());
         return u;
     }
 
     public static void updateEntity(User user, UserRequest request) {
-        if (request.password() != null) {
-            user.setPassword(request.password());
+        if (request.getPassword() != null) {
+            user.setPassword(request.getPassword());
         }
-        if (request.email() != null) {
-            user.setEmail(request.email());
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
         }
-        if (request.status() != null) {
-            user.setStatus(request.status());
+        if (request.getStatus() != null) {
+            user.setStatus(request.getStatus());
         }
-        if (request.username() != null) {
-            user.setUsername(request.username());
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
         }
 
     }

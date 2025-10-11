@@ -23,6 +23,10 @@ spring:
     init:
       mode: always   # run schema/data.sql on startup if present
 
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
+    com.bbu.hrms.user_service.service: DEBUG
+    com.bbu.hrms.user_service.client: DEBUG
+    org.springframework.cloud.openfeign: DEBUG

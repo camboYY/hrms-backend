@@ -1,10 +1,7 @@
 package com.bbu.hrms.user_service.service;
 
 
-import com.bbu.hrms.user_service.dto.EmployeeContactDTO;
-import com.bbu.hrms.user_service.dto.EmployeeDTO;
-import com.bbu.hrms.user_service.dto.EmployeeDocumentDTO;
-import com.bbu.hrms.user_service.dto.EmployeeResponse;
+import com.bbu.hrms.user_service.dto.*;
 import com.bbu.hrms.user_service.model.EmployeeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +13,7 @@ public interface EmployeeServiceInterface {
     EmployeeDTO update(Long id, EmployeeDTO dto);
     EmployeeDTO get(Long id);
     void delete(Long id);
-    List<EmployeeResponse> getEmployeesByManager(Long managerId);
+    List<LeaveRequestDTO> getEmployeesByManager(Long managerId);
 
     Page<EmployeeDTO> list(EmployeeStatus status, Pageable pageable);
 

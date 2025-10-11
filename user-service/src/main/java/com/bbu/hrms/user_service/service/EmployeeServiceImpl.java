@@ -1,22 +1,23 @@
 package com.bbu.hrms.user_service.service;
 
 
-import com.bbu.hrms.user_service.dto.EmployeeContactDTO;
-import com.bbu.hrms.user_service.dto.EmployeeDTO;
-import com.bbu.hrms.user_service.dto.EmployeeDocumentDTO;
-import com.bbu.hrms.user_service.dto.EmployeeResponse;
+import com.bbu.hrms.user_service.client.LeaveFeignClient;
+import com.bbu.hrms.user_service.dto.*;
 import com.bbu.hrms.user_service.model.Employee;
 import com.bbu.hrms.user_service.model.EmployeeContact;
 import com.bbu.hrms.user_service.model.EmployeeDocument;
 import com.bbu.hrms.user_service.model.EmployeeStatus;
 import com.bbu.hrms.user_service.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,8 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
     private final PositionRepository positionRepo;
     private final EmployeeContactRepository contactRepo;
     private final EmployeeDocumentRepository documentRepo;
+    private final LeaveFeignClient leaveClient;
+    private final Logger logger = getLogger(EmployeeServiceImpl.class);
 
     // --- mapping helpers (simple, no MapStruct for brevity)
     private EmployeeDTO toDTO(Employee e) {
@@ -128,26 +131,12 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
     }
 
     @Override
-    public List<EmployeeResponse> getEmployeesByManager(Long managerId) {
-        List<Employee> employees = employeeRepo.findByManagerId(managerId);
-        return employees.stream()
-                .map(emp -> {
-                    EmployeeResponse dto = new EmployeeResponse();
-                    dto.setId(emp.getId());
-                    dto.setDob(emp.getDob());
-                    dto.setEmployeeCode(emp.getEmployeeCode());
-                    dto.setFirstName(emp.getFirstName());
-                    dto.setLastName(emp.getLastName());
-                    dto.setGender(emp.getGender());
-                    dto.setDob(emp.getDob());
-                    dto.setMaritalStatus(emp.getMaritalStatus());
-                    dto.setHireDate(emp.getHireDate());
-                    dto.setJobTitle(emp.getJobTitle());
-                    dto.setStatus(emp.getStatus());
-                    dto.setDepartmentName(emp.getDepartment() != null ? emp.getDepartment().getName() : null);
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    public List<LeaveRequestDTO> getEmployeesByManager(Long managerId) {
+        List<Employee> employees = employeeRepo.findByManagerUserId(managerId);
+        var ids = employees.stream().map(Employee::getUserId).collect(Collectors.toList());
+        if (ids.isEmpty()) return List.of();
+        logger.info("Retrieving leave requests for employees {} for manager {}",ids, managerId);
+        return leaveClient.getLeavesByEmployeeIdsAndStatus(ids, "PENDING");
     }
 
     @Override @Transactional(readOnly = true)

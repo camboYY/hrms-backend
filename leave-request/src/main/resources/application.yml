@@ -24,3 +24,26 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    com.bbu.hrms.leave_request.service: DEBUG
+    com.bbu.hrms.leave_request.client: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+rabbitmq:
+  exchange:
+    leave: leave.exchange
+  routing:
+    leave:
+      approved: leave.approved
+  queue:
+    leave:
+      approved: leave.approved.queue
