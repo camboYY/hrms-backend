@@ -84,6 +84,24 @@ spring:
           filters:
             - RewritePath=/v3/api-docs/user(?<segment>/?.*), /v3/api-docs${segment}
 
+        # ===================== ATTENDANCE SERVICE =====================
+        - id: attendance-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/attendances/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+        # Forward attendance-service docs
+        - id: attendance-docs
+          uri: http://localhost:8085
+          predicates:
+            - Path=/v3/api-docs/attendance
+          filters:
+            - RewritePath=/v3/api-docs/attendances(?<segment>/?.*), /v3/api-docs${segment}
   security:
     oauth2:
       resourceserver:

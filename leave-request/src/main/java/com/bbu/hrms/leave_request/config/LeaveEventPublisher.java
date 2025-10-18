@@ -1,6 +1,6 @@
 package com.bbu.hrms.leave_request.config;
 
-import com.bbu.hrms.leave_request.dto.LeaveApprovedEvent;
+import com.bbu.hrms.common.events.LeaveApprovedEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

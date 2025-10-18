@@ -1,0 +1,38 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: attendance-service
+  datasource:
+    url: jdbc:postgresql://localhost:5435/attendance_db
+    username: myuser
+    password: mypassword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  exchange:
+    leave: leave.exchange
+  routing:
+    leave:
+      approved: leave.approved
+  queue:
+    leave:
+      approved: leave.approved.queue
+
+logging:
+  level:
+    org.springframework.amqp.rabbit.listener: DEBUG
+    com.bbu.hrms.attendance_service.listener: DEBUG

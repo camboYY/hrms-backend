@@ -1,21 +1,26 @@
 package com.bbu.hrms.leave_request.service;
 
-import com.bbu.hrms.leave_request.config.RabbitConfig;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bbu.hrms.common.events.LeaveApprovedEvent;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LeaveApprovalPublisher {
 
-    private final AmqpTemplate amqpTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    public LeaveApprovalPublisher(AmqpTemplate amqpTemplate) {
-        this.amqpTemplate = amqpTemplate;
+    @Value("${rabbitmq.exchange.leave}")
+    private String exchange;
+
+    @Value("${rabbitmq.routing.leave.approved}")
+    private String routingKey;
+
+    public LeaveApprovalPublisher(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendLeaveApprovalNotification(String message) {
-        amqpTemplate.convertAndSend(RabbitConfig.QUEUE, message);
+    public void publishLeaveApprovedEvent(LeaveApprovedEvent event) {
+        rabbitTemplate.convertAndSend(exchange, routingKey, event);
     }
 }

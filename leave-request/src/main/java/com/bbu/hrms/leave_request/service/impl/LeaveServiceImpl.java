@@ -1,7 +1,7 @@
 package com.bbu.hrms.leave_request.service.impl;
 
 
-import com.bbu.hrms.leave_request.client.EmployeeClient;
+import com.bbu.hrms.common.events.LeaveApprovedEvent;
 import com.bbu.hrms.leave_request.dto.*;
 import com.bbu.hrms.leave_request.model.LeaveBalance;
 import com.bbu.hrms.leave_request.model.LeaveRequest;
@@ -10,6 +10,7 @@ import com.bbu.hrms.leave_request.model.LeaveType;
 import com.bbu.hrms.leave_request.repository.LeaveBalanceRepository;
 import com.bbu.hrms.leave_request.repository.LeaveRequestRepository;
 import com.bbu.hrms.leave_request.repository.LeaveTypeRepository;
+import com.bbu.hrms.leave_request.service.LeaveApprovalPublisher;
 import com.bbu.hrms.leave_request.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,7 @@ public class LeaveServiceImpl implements LeaveService {
     private final LeaveTypeRepository leaveTypeRepo;
     private final LeaveRequestRepository leaveRequestRepo;
     private final LeaveBalanceRepository leaveBalanceRepo;
+    private final LeaveApprovalPublisher leaveEventPublisher;
     private final Logger logger = getLogger(LeaveServiceImpl.class);
 
     // --- Leave Types ---
@@ -84,6 +86,20 @@ public class LeaveServiceImpl implements LeaveService {
         bal.setUsedDays(bal.getUsedDays() + days);
         bal.setRemainingDays(bal.getAllocatedDays() - bal.getUsedDays());
         leaveBalanceRepo.save(bal);
+        // End update balance
+
+        // Publish event
+        LeaveApprovedEvent event = new LeaveApprovedEvent();
+        event.setEmployeeId(req.getEmployeeId());
+        event.setApproverId(approverId);
+        event.setStartDate(req.getStartDate());
+        event.setEndDate(req.getEndDate());
+        event.setLeaveType(req.getLeaveType().getName());
+        event.setStatus(req.getStatus().name());
+        // End publish event
+        logger.info("Publishing leave approved event: " + event);
+        leaveEventPublisher.publishLeaveApprovedEvent(event);
+        logger.info("Publishing leave approved event finished: " + event);
 
         return toDTO(req);
     }

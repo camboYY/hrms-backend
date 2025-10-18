@@ -1,15 +1,16 @@
-package com.bbu.hrms.leave_request.dto;
+package com.bbu.hrms.common.events;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
+
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class LeaveApprovedEvent implements Serializable {
     private Long employeeId;
     private Long approverId;
