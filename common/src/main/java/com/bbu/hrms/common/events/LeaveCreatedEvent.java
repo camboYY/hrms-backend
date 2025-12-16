@@ -7,11 +7,10 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class LeaveApprovedEvent implements Serializable {
+public class LeaveCreatedEvent implements Serializable {
     private Long employeeId;
     private Long approverId;
     private LocalDate startDate;
@@ -19,5 +18,4 @@ public class LeaveApprovedEvent implements Serializable {
     private String leaveType;
     private String status;
     private String message;
-    // getters and setters
 }

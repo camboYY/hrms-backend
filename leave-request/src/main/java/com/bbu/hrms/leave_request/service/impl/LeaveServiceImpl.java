@@ -2,6 +2,8 @@ package com.bbu.hrms.leave_request.service.impl;
 
 
 import com.bbu.hrms.common.events.LeaveApprovedEvent;
+import com.bbu.hrms.common.events.LeaveCreatedEvent;
+import com.bbu.hrms.common.events.LeaveRejectedEvent;
 import com.bbu.hrms.leave_request.dto.*;
 import com.bbu.hrms.leave_request.model.LeaveBalance;
 import com.bbu.hrms.leave_request.model.LeaveRequest;
@@ -10,7 +12,7 @@ import com.bbu.hrms.leave_request.model.LeaveType;
 import com.bbu.hrms.leave_request.repository.LeaveBalanceRepository;
 import com.bbu.hrms.leave_request.repository.LeaveRequestRepository;
 import com.bbu.hrms.leave_request.repository.LeaveTypeRepository;
-import com.bbu.hrms.leave_request.service.LeaveApprovalPublisher;
+import com.bbu.hrms.leave_request.service.LeaveEventPublisher;
 import com.bbu.hrms.leave_request.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +31,7 @@ public class LeaveServiceImpl implements LeaveService {
     private final LeaveTypeRepository leaveTypeRepo;
     private final LeaveRequestRepository leaveRequestRepo;
     private final LeaveBalanceRepository leaveBalanceRepo;
-    private final LeaveApprovalPublisher leaveEventPublisher;
+    private final LeaveEventPublisher leaveEventPublisher;
     private final Logger logger = getLogger(LeaveServiceImpl.class);
 
     // --- Leave Types ---
@@ -67,6 +69,21 @@ public class LeaveServiceImpl implements LeaveService {
         req = leaveRequestRepo.save(req);
         dto.setId(req.getId());
         dto.setStatus(req.getStatus());
+
+        // Publish event
+        LeaveCreatedEvent event = new LeaveCreatedEvent();
+        event.setEmployeeId(req.getEmployeeId());
+        event.setApproverId(null);
+        event.setStartDate(req.getStartDate());
+        event.setEndDate(req.getEndDate());
+        event.setLeaveType(req.getLeaveType().getName());
+        event.setStatus(req.getStatus().name());
+        event.setMessage("Leave requested");
+        // End publish event
+        logger.info("Publishing leave requested event: " + event);
+        leaveEventPublisher.publishLeaveCreatedEvent(event);
+        logger.info("Publishing leave requested event finished: " + event);
+
         return dto;
     }
 
@@ -96,6 +113,7 @@ public class LeaveServiceImpl implements LeaveService {
         event.setEndDate(req.getEndDate());
         event.setLeaveType(req.getLeaveType().getName());
         event.setStatus(req.getStatus().name());
+        event.setMessage("Leave approved");
         // End publish event
         logger.info("Publishing leave approved event: " + event);
         leaveEventPublisher.publishLeaveApprovedEvent(event);
@@ -109,6 +127,21 @@ public class LeaveServiceImpl implements LeaveService {
         LeaveRequest req = leaveRequestRepo.findById(requestId).orElseThrow();
         req.setStatus(LeaveStatus.REJECTED);
         req.setApproverId(approverId);
+
+        // Publish event
+        LeaveRejectedEvent event = new LeaveRejectedEvent();
+        event.setEmployeeId(req.getEmployeeId());
+        event.setApproverId(approverId);
+        event.setStartDate(req.getStartDate());
+        event.setEndDate(req.getEndDate());
+        event.setLeaveType(req.getLeaveType().getName());
+        event.setStatus(req.getStatus().name());
+        event.setMessage("Leave rejected");
+        // End publish event
+        logger.info("Publishing leave rejected event: " + event);
+        leaveEventPublisher.publishLeaveRejectedEvent(event);
+        logger.info("Publishing leave rejected event finished: " + event);
+
         return toDTO(req);
     }
 

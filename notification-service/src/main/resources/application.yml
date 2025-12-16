@@ -1,13 +1,15 @@
+
 server:
-  port: 8083
+  port: 8086
 
 spring:
   application:
-    name: leave-request
+    name: notification-service
+
   datasource:
-    url: jdbc:postgresql://localhost:5434/hrms_leavedb
-    username: myuser
-    password: mypassword
+    url: jdbc:postgresql://localhost:5436/hrms_notifications
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,20 +20,6 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    com.bbu.hrms.leave_request.service: DEBUG
-    com.bbu.hrms.leave_request.client: DEBUG
-    org.springframework.cloud.openfeign: DEBUG
-
   rabbitmq:
     host: localhost
     port: 5672
@@ -49,3 +37,14 @@ rabbitmq:
   queue:
     leave:
       notification: leave.notification.queue
+
+slack:
+  webhook-url: https://hooks.slack.com/services/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
+
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000

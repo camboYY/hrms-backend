@@ -13,6 +13,11 @@ springdoc:
         url: /v3/api-docs/user
       - name: leave-request-service
         url: /v3/api-docs/leave
+      - name: attendance-service
+        url: /v3/api-docs/attendance
+      - name: notification-service
+        url: /v3/api-docs/notifications
+
 
 spring:
   cloud:
@@ -102,6 +107,27 @@ spring:
             - Path=/v3/api-docs/attendance
           filters:
             - RewritePath=/v3/api-docs/attendances(?<segment>/?.*), /v3/api-docs${segment}
+
+        # ===================== NOTIFICATION SERVICE =====================
+        - id: notification-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+        # Forward notification-service docs
+        - id: notification-docs
+          uri: http://localhost:8086
+          predicates:
+            - Path=/v3/api-docs/notifications
+          filters:
+            - RewritePath=/v3/api-docs/notifications(?<segment>/?.*), /v3/api-docs${segment}
+
+
   security:
     oauth2:
       resourceserver:

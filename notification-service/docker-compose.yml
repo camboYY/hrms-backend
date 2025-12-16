@@ -1,11 +1,45 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"      # RabbitMQ client port
-      - "15672:15672"    # Management UI port
+
+  notification-db:
+    image: postgres:15
+    container_name: notification-db
+    restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      POSTGRES_DB: hrms_notifications
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5436:5432"
+    volumes:
+      - notification_db_data:/var/lib/postgresql/data
+    networks:
+      - hrms-net
+
+  notification-service:
+    build: .
+    container_name: notification-service
+    restart: unless-stopped
+    depends_on:
+      - notification-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/hrms_notifications
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_RABBITMQ_HOST: rabbitmq   # use container name
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8086:8086"
+    networks:
+      - hrms-net
+
+volumes:
+  notification_db_data:
+
+networks:
+  hrms-net:
+    external: true

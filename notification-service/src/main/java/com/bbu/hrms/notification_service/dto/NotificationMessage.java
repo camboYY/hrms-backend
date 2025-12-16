@@ -1,17 +1,12 @@
-package com.bbu.hrms.common.events;
+package com.bbu.hrms.notification_service.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-
-@Getter
-@Setter
-@NoArgsConstructor
-public class LeaveApprovedEvent implements Serializable {
+@Data
+public class NotificationMessage implements Serializable {
     private Long employeeId;
     private Long approverId;
     private LocalDate startDate;
@@ -19,5 +14,4 @@ public class LeaveApprovedEvent implements Serializable {
     private String leaveType;
     private String status;
     private String message;
-    // getters and setters
 }
