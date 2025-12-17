@@ -25,6 +25,11 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>com.bbu.hrms</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 		<!-- Web API -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

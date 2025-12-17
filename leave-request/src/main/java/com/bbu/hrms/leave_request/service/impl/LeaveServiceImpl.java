@@ -16,8 +16,10 @@ import com.bbu.hrms.leave_request.service.LeaveEventPublisher;
 import com.bbu.hrms.leave_request.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -106,7 +108,7 @@ public class LeaveServiceImpl implements LeaveService {
         // End update balance
 
         // Publish event
-        LeaveApprovedEvent event = new LeaveApprovedEvent();
+        LeaveCreatedEvent event = new LeaveCreatedEvent();
         event.setEmployeeId(req.getEmployeeId());
         event.setApproverId(approverId);
         event.setStartDate(req.getStartDate());
@@ -116,7 +118,7 @@ public class LeaveServiceImpl implements LeaveService {
         event.setMessage("Leave approved");
         // End publish event
         logger.info("Publishing leave approved event: " + event);
-        leaveEventPublisher.publishLeaveApprovedEvent(event);
+        leaveEventPublisher.publishLeaveCreatedEvent(event);
         logger.info("Publishing leave approved event finished: " + event);
 
         return toDTO(req);
@@ -129,7 +131,7 @@ public class LeaveServiceImpl implements LeaveService {
         req.setApproverId(approverId);
 
         // Publish event
-        LeaveRejectedEvent event = new LeaveRejectedEvent();
+        LeaveCreatedEvent event = new LeaveCreatedEvent();
         event.setEmployeeId(req.getEmployeeId());
         event.setApproverId(approverId);
         event.setStartDate(req.getStartDate());
@@ -139,7 +141,7 @@ public class LeaveServiceImpl implements LeaveService {
         event.setMessage("Leave rejected");
         // End publish event
         logger.info("Publishing leave rejected event: " + event);
-        leaveEventPublisher.publishLeaveRejectedEvent(event);
+        leaveEventPublisher.publishLeaveCreatedEvent(event);
         logger.info("Publishing leave rejected event finished: " + event);
 
         return toDTO(req);
@@ -181,7 +183,10 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public LeaveBalanceDTO getBalance(Long employeeId, Long leaveTypeId) {
-        LeaveBalance bal = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(employeeId, leaveTypeId).orElseThrow();
+        System.out.println("Getting leave balance for employee " + employeeId + " and leaveType " + leaveTypeId);
+        LeaveBalance bal = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(employeeId, leaveTypeId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Leave balance not found for employee " + employeeId + " and leaveType " + leaveTypeId));
         return LeaveBalanceDTO.fromEntity(bal);
     }
 

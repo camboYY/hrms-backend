@@ -122,7 +122,8 @@ public class EmployeeServiceImpl  implements EmployeeServiceInterface {
 
     @Override @Transactional(readOnly = true)
     public EmployeeDTO get(Long id) {
-        return employeeRepo.findById(id).map(this::toDTO).orElseThrow();
+        Employee e = employeeRepo.findByUserId(id);
+        return toDTO(e);
     }
 
     @Override

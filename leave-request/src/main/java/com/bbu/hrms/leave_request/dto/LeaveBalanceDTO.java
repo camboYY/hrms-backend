@@ -30,6 +30,7 @@ public class LeaveBalanceDTO {
                 .allocatedDays(entity.getAllocatedDays())
                 .usedDays(entity.getUsedDays())
                 .remainingDays(entity.getRemainingDays())
+                .employeeName(entity.getLeaveType().getName())
                 .build();
     }
 }

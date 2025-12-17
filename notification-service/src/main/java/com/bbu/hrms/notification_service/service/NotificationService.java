@@ -1,6 +1,5 @@
 package com.bbu.hrms.notification_service.service;
 
-import com.bbu.hrms.notification_service.dto.NotificationMessage;
 import com.bbu.hrms.notification_service.entity.Notification;
 import com.bbu.hrms.notification_service.entity.NotificationTemplate;
 import com.bbu.hrms.notification_service.repository.NotificationRepository;
@@ -8,6 +7,7 @@ import com.bbu.hrms.notification_service.repository.NotificationTemplateReposito
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.bbu.hrms.common.events.LeaveCreatedEvent;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +23,7 @@ public class NotificationService {
     private final ChannelSender channelSender; // email/push placeholders
 
     @Transactional
-    public void processNotification(NotificationMessage message) {
+    public void processNotification(LeaveCreatedEvent message) {
 
         String templateCode = switch (message.getStatus()) {
             case "APPROVED" -> "LEAVE_APPROVED";
@@ -72,12 +72,12 @@ public class NotificationService {
                     case "email" -> channelSender.sendEmail(notif.getUserId(), notif.getTitle(), notif.getBody());
                     case "push"  -> channelSender.sendPush(notif.getUserId(), notif.getTitle(), notif.getBody());
                     case "in_app" -> { /* internal, stored in DB already */ }
-                    case "slack" -> slackService.sendSlackMessage(notif.getBody());
                     default -> {}
                 }
             }
         } catch (Exception ex) {
             allSent = false;
+            System.err.println("Failed to send  message: " + ex.getMessage());
         }
 
         notif.setStatus(allSent ? "SENT" : "FAILED");

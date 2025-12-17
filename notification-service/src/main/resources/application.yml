@@ -39,7 +39,7 @@ rabbitmq:
       notification: leave.notification.queue
 
 slack:
-  webhook-url: https://hooks.slack.com/services/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
+  webhook-url: https://hooks.slack.com/services/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
 
 
 feign:

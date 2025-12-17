@@ -18,10 +18,14 @@ public class SlackService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public void sendSlackMessage(String message) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("text", message);
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("text", message);
 
-        restTemplate.postForObject(slackWebhookUrl, payload, String.class);
+            restTemplate.postForObject(slackWebhookUrl, payload, String.class);
+        }catch (Exception e) {
+            System.err.println("Failed to send Slack message: " + e.getMessage());
+        }
     }
 }
 
