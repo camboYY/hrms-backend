@@ -41,7 +41,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/v3/api-docs/**",
+                                "/docs/**"
                         ).permitAll()
                         // ✅ Whitelist aggregated service docs explicitly
                         .pathMatchers("/v3/api-docs/auth/**", "/v3/api-docs/user/**").permitAll()

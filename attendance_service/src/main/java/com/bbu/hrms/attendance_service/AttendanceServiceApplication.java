@@ -4,8 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication
-@EnableFeignClients(basePackages = "com.bbu.hrms.attendance_service.client")
+@SpringBootApplication(scanBasePackages = {
+		"com.bbu.hrms.attendance_service",
+		"com.bbu.hrms.common"   // ✅ add this
+})@EnableFeignClients(basePackages = "com.bbu.hrms.attendance_service.client")
 public class AttendanceServiceApplication {
 
 	public static void main(String[] args) {

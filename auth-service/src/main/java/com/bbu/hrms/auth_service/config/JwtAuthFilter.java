@@ -1,6 +1,6 @@
 package com.bbu.hrms.auth_service.config;
 
-import com.bbu.hrms.auth_service.Utility.JwtUtil;
+import com.bbu.hrms.common.events.Utility.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -2,21 +2,21 @@ server:
   port: 8080
 
 springdoc:
-  api-docs:
-    enabled: true
   swagger-ui:
     path: /swagger-ui.html
     urls:
       - name: auth-service
-        url: /v3/api-docs/auth
+        url: /docs/auth
       - name: user-service
-        url: /v3/api-docs/user
+        url: /docs/user
       - name: leave-request-service
-        url: /v3/api-docs/leave
+        url: /docs/leave
       - name: attendance-service
-        url: /v3/api-docs/attendance
+        url: /docs/attendance
+
       - name: notification-service
-        url: /v3/api-docs/notifications
+        url: /docs/notification
+
 
 
 spring:
@@ -29,103 +29,45 @@ spring:
         - name: PreserveHostHeader
 
       routes:
-        # ===================== LEAVE REQUEST SERVICE =====================
-        - id: leave-request-service
-          uri: http://localhost:8083
-          predicates:
-            - Path=/leaves/**, /leave-types/**, /leave-balances/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@ipKeyResolver}"
-
-        # Forward leave-request-service docs
-        - id: leave-request-docs
-          uri: http://localhost:8083
-          predicates:
-            - Path=/v3/api-docs/leave
-          filters:
-            - RewritePath=/v3/api-docs/leave(?<segment>/?.*), /v3/api-docs${segment}
-
-        # ===================== AUTH SERVICE =====================
-        - id: auth-service
-          uri: http://localhost:8081
-          predicates:
-            - Path=/auth/**, /users/**, /roles/**, /permissions/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@ipKeyResolver}"
-
-        # Forward auth-service docs
+        # AUTH
         - id: auth-docs
           uri: http://localhost:8081
           predicates:
-            - Path=/v3/api-docs/auth
+            - Path=/docs/auth
           filters:
-            - RewritePath=/v3/api-docs/auth(?<segment>/?.*), /v3/api-docs${segment}
+            - SetPath=/v3/api-docs
 
-        # ===================== USER SERVICE =====================
-        - id: user-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/departments/**, /employees/**, /positions/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@ipKeyResolver}"
-
-        # Forward user-service docs
+        # USER
         - id: user-docs
           uri: http://localhost:8082
           predicates:
-            - Path=/v3/api-docs/user, /v3/api-docs/user/**
+            - Path=/docs/user
           filters:
-            - RewritePath=/v3/api-docs/user(?<segment>/?.*), /v3/api-docs${segment}
+            - SetPath=/v3/api-docs
 
-        # ===================== ATTENDANCE SERVICE =====================
-        - id: attendance-service
-          uri: http://localhost:8085
+        # LEAVE
+        - id: leave-docs
+          uri: http://localhost:8083
           predicates:
-            - Path=/attendances/**
+            - Path=/docs/leave
           filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@ipKeyResolver}"
-        # Forward attendance-service docs
+            - SetPath=/v3/api-docs
+
+        # ATTENDANCE
         - id: attendance-docs
+          uri: http://localhost:8084
+          predicates:
+            - Path=/docs/attendance, /docs/attendance/**
+          filters:
+            - SetPath=/v3/api-docs
+
+        # NOTIFICATION
+        - id: notification-docs
           uri: http://localhost:8085
           predicates:
-            - Path=/v3/api-docs/attendance
+            - Path=/docs/notification, /docs/notification/**
           filters:
-            - RewritePath=/v3/api-docs/attendances(?<segment>/?.*), /v3/api-docs${segment}
-
-        # ===================== NOTIFICATION SERVICE =====================
-        - id: notification-service
-          uri: http://localhost:8086
-          predicates:
-            - Path=/notifications/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@ipKeyResolver}"
-        # Forward notification-service docs
-        - id: notification-docs
-          uri: http://localhost:8086
-          predicates:
-            - Path=/v3/api-docs/notifications
-          filters:
-            - RewritePath=/v3/api-docs/notifications(?<segment>/?.*), /v3/api-docs${segment}
+            - SetPath=/v3/api-docs
 
 
   security:

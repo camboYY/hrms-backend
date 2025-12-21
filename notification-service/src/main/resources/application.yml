@@ -1,6 +1,6 @@
 
 server:
-  port: 8086
+  port: 8085
 
 spring:
   application:
@@ -48,3 +48,11 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 5000
+
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+

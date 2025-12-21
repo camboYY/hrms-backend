@@ -22,19 +22,20 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long employeeId;
+    private Long employeeId; // mapped from User Service
 
     private LocalDateTime checkInTime;
 
     private LocalDateTime checkOutTime;
 
-    private LocalDate date;
+    private LocalDate date; //workDate
 
     private String note;
 
     private String location;
 
-    private String status; // PRESENT, ON_LEAVE, ABSENT
+    @Enumerated(EnumType.STRING)
+    private AttendanceStatus status; // PRESENT, ON_LEAVE, ABSENT, LATE, HALF_DAY
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -42,3 +43,5 @@ public class Attendance {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 }
+
+

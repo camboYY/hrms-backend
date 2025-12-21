@@ -1,7 +1,7 @@
-package com.bbu.hrms.auth_service.Utility;
+package com.bbu.hrms.common.events.Utility;
 
-import com.bbu.hrms.auth_service.model.Role;
-import com.bbu.hrms.auth_service.model.User;
+
+import com.bbu.hrms.common.events.model.AuthUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,20 +23,21 @@ public class JwtUtil {
 
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public String generateToken(User user) {
+    public String generateToken(AuthUser user) {
         // 1h
         long accessTokenExpiration = 3600000;
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("userId", user.getId())
-                .claim("roles", user.getRoles().stream().map(Role::getName).toList())
+                .claim("roles", user.getRoles())
+                .claim("permissions", user.getPermissions())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(key, SignatureAlgorithm.HS256) // ✅ New API
                 .compact();
     }
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(AuthUser user) {
         // 7 days
         long refreshTokenExpiration = 1000 * 60 * 60 * 24 * 7;
         return Jwts.builder()

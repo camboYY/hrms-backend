@@ -8,12 +8,12 @@ services:
       dockerfile: Dockerfile
     container_name: attendance-service
     ports:
-      - "8085:8085"
+      - "8084:8084"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://attendance-db:5435/attendance_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://attendance-db:5432/attendance_db
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
-      SPRING_RABBITMQ_HOST: host.docker.internal   # 👈 Connect to shared RabbitMQ
+      SPRING_RABBITMQ_HOST: rabbitmq   # 👈 Connect to shared RabbitMQ
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
@@ -43,4 +43,4 @@ volumes:
 
 networks:
   hrms-net:
-    driver: bridge
+    external: true

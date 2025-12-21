@@ -1,6 +1,5 @@
 package com.bbu.hrms.auth_service.service;
 
-import com.bbu.hrms.auth_service.Utility.JwtUtil;
 import com.bbu.hrms.auth_service.dto.*;
 import com.bbu.hrms.auth_service.exception.InvalidTokenException;
 import com.bbu.hrms.auth_service.exception.NewPasswordRequiredException;
@@ -11,6 +10,7 @@ import com.bbu.hrms.auth_service.model.Role;
 import com.bbu.hrms.auth_service.model.User;
 import com.bbu.hrms.auth_service.repository.RoleRepository;
 import com.bbu.hrms.auth_service.repository.UserRepository;
+import com.bbu.hrms.common.events.model.AuthUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.bbu.hrms.common.events.Utility.JwtUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,10 @@ public class AuthService {
             throw new InvalidTokenException("Invalid credentials");
         }
 
-        String accessToken = jwtUtil.generateToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
+        AuthUser authUser = UserMapper.mapToAuthUser(user);
+
+        String accessToken = jwtUtil.generateToken(authUser);
+        String refreshToken = jwtUtil.generateRefreshToken(authUser);
 
         return new AuthResponse(
                 accessToken,
@@ -84,9 +87,9 @@ public class AuthService {
         user.getRoles().add(defaultRole);
 
         userRepo.save(user);
-
-        String accessToken = jwtUtil.generateToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
+        AuthUser authUser = UserMapper.mapToAuthUser(user);
+        String accessToken = jwtUtil.generateToken(authUser);
+        String refreshToken = jwtUtil.generateRefreshToken(authUser);
 
         return new AuthResponse(
                 accessToken,
@@ -118,8 +121,10 @@ public class AuthService {
                 throw new InvalidTokenException("Invalid token user");
             }
 
-            String accessToken = jwtUtil.generateToken(user.get());
-            String refreshToken = jwtUtil.generateRefreshToken(user.get());
+            AuthUser authUser = UserMapper.mapToAuthUser(user.get());
+
+            String accessToken = jwtUtil.generateToken(authUser);
+            String refreshToken = jwtUtil.generateRefreshToken(authUser);
 
             return new AuthResponse(
                     accessToken,

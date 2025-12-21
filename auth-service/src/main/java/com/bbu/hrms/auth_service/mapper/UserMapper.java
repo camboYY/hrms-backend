@@ -7,6 +7,9 @@ import com.bbu.hrms.auth_service.dto.UserResponse;
 import com.bbu.hrms.auth_service.model.Permission;
 import com.bbu.hrms.auth_service.model.Role;
 import com.bbu.hrms.auth_service.model.User;
+import com.bbu.hrms.common.events.model.AuthUser;
+
+import java.util.stream.Collectors;
 
 public class UserMapper {
 
@@ -31,20 +34,20 @@ public class UserMapper {
     }
 
     public static void updateEntity(User user, UserRequest request) {
-        if (request.getPassword() != null) {
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(request.getPassword());
         }
-        if (request.getEmail() != null) {
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
             user.setEmail(request.getEmail());
         }
-        if (request.getStatus() != null) {
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
             user.setStatus(request.getStatus());
         }
-        if (request.getUsername() != null) {
+        if (request.getUsername() != null && !request.getUsername().isEmpty()) {
             user.setUsername(request.getUsername());
         }
-
     }
+
 
     public static PermissionResponse toResponse(Permission p) {
         return new PermissionResponse(p.getId(), p.getName());
@@ -56,6 +59,31 @@ public class UserMapper {
                 r.getName(),
                 r.getPermissions().stream().map(UserMapper::toResponse).toList()
         );
+    }
+
+    public static AuthUser mapToAuthUser(User user) {
+
+        AuthUser dto = new AuthUser();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+
+        dto.setRoles(
+                user.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet())
+        );
+
+        dto.setPermissions(
+                user.getRoles()
+                        .stream()
+                        .flatMap(r -> r.getPermissions().stream())
+                        .map(Permission::getName)
+                        .collect(Collectors.toSet())
+        );
+
+        return dto;
     }
 
 }

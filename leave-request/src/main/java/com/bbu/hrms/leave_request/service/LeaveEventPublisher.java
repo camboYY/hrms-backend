@@ -18,13 +18,6 @@ public class LeaveEventPublisher {
     @Value("${rabbitmq.routing.leave.created}")
     private String createdRouting;
 
-    @Value("${rabbitmq.routing.leave.approved}")
-    private String approvedRouting;
-
-    @Value("${rabbitmq.routing.leave.rejected}")
-    private String rejectedRouting;
-
-
     public LeaveEventPublisher(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -33,11 +26,4 @@ public class LeaveEventPublisher {
         rabbitTemplate.convertAndSend(exchange, createdRouting, event);
     }
 
-    public void publishLeaveApprovedEvent(LeaveApprovedEvent event) {
-        rabbitTemplate.convertAndSend(exchange, approvedRouting, event);
-    }
-
-    public void publishLeaveRejectedEvent(LeaveRejectedEvent event) {
-        rabbitTemplate.convertAndSend(exchange, rejectedRouting, event);
-    }
 }

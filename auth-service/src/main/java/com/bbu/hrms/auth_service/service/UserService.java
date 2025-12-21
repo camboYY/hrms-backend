@@ -45,7 +45,10 @@ public class UserService {
 
     public UserResponse update(Long id, UserRequest request) {
         User existing = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        // Encode password only if it is provided
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            request.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         logger.info("User updated: " + request);
         UserMapper.updateEntity(existing, request);
         return UserMapper.toResponse(repo.save(existing));

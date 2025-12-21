@@ -16,12 +16,6 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.routing.leave.created}")
     private String createdRouting;
 
-    @Value("${rabbitmq.routing.leave.approved}")
-    private String approvedRouting;
-
-    @Value("${rabbitmq.routing.leave.rejected}")
-    private String rejectedRouting;
-
     @Bean
     public TopicExchange leaveExchange() {
         return new TopicExchange(exchange);
@@ -33,27 +27,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding bindCreated() {
-        return BindingBuilder
-                .bind(notificationQueue())
-                .to(leaveExchange())
-                .with(createdRouting);
-    }
-
-    @Bean
     public Binding bindApproved() {
         return BindingBuilder
                 .bind(notificationQueue())
                 .to(leaveExchange())
-                .with(approvedRouting);
-    }
-
-    @Bean
-    public Binding bindRejected() {
-        return BindingBuilder
-                .bind(notificationQueue())
-                .to(leaveExchange())
-                .with(rejectedRouting);
+                .with(createdRouting);
     }
 
 }
