@@ -27,4 +27,6 @@ public class LeaveRequestDTO {
     private LeaveStatus status;
 
     private Long approverId;
+
+    private  String leaveTypeName;
 }

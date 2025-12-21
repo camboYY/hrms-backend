@@ -41,13 +41,15 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Transactional
     @Override
-    public AttendanceResponse markAttendance(Long employeeId) {
+    public Attendance markAttendance(Long employeeId, String note, String location) {
 
         Attendance record =  repo.findByEmployeeIdAndDate(employeeId, LocalDateTime.now().toLocalDate())
                 .orElseGet(() -> Attendance.builder()
                         .employeeId(employeeId)
                         .status(AttendanceStatus.PRESENT)
                         .date(LocalDateTime.now().toLocalDate())
+                        .note(note)
+                        .location(location)
                         .build()
                 );
 
@@ -61,16 +63,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         record.setCheckInTime(LocalDateTime.now());
 
-        repo.save(record);
-        return AttendanceResponse.builder()
-                .id(record.getId())
-                .date(record.getDate())
-                .checkInTime(record.getCheckInTime())
-                .checkOutTime(record.getCheckOutTime())
-                .status(record.getStatus())
-                .note(record.getNote())
-                .location(record.getLocation())
-                .build();
+
+        return repo.save(record);
     }
 
     @Transactional

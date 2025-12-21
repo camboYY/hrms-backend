@@ -2,6 +2,7 @@ package com.bbu.hrms.attendance_service.controller;
 
 import com.bbu.hrms.attendance_service.client.UserClient;
 import com.bbu.hrms.attendance_service.dto.AttendanceResponse;
+import com.bbu.hrms.attendance_service.dto.CheckInRequest;
 import com.bbu.hrms.attendance_service.dto.CheckOutRequest;
 import com.bbu.hrms.attendance_service.dto.EmployeeDTO;
 import com.bbu.hrms.attendance_service.entity.Attendance;
@@ -29,15 +30,28 @@ public class AttendanceController {
     private final JwtUtil jwtUtil; // From Auth Service or a shared library
 
     @Operation(summary = "Mark attendance")
-    @PostMapping("/{employeeId}")
+    @PostMapping("/check-in")
     public ResponseEntity<AttendanceResponse> markAttendance(
-            @PathVariable Long employeeId) {
-        return ResponseEntity.ok(service.markAttendance(employeeId));
+            HttpServletRequest servletRequest,
+            @RequestBody CheckInRequest request) {
+        System.out.println("Check-in request received: " + request);
+
+        Long employeeId = resolveEmployeeId(servletRequest);
+        System.out.println("Resolved employeeId: " + employeeId);
+
+        Attendance a = service.markAttendance(
+                employeeId,
+                request.getNote(),
+                request.getLocation()
+        );
+        System.out.println("Attendance marked: " + a);
+
+        return ResponseEntity.ok(map(a));
     }
 
     @Operation(summary = "Check out")
     @PostMapping("/check-out")
-    public AttendanceResponse checkOut(
+    public ResponseEntity<AttendanceResponse> checkOut(
             HttpServletRequest servletRequest,
             @RequestBody CheckOutRequest request
     ) {
@@ -47,21 +61,21 @@ public class AttendanceController {
                 employeeId,
                 request.getNote()
         );
-        return map(a);
+        return ResponseEntity.ok( map(a));
     }
 
     @Operation(summary = "Get my attendance")
     @GetMapping("/me")
-    public List<AttendanceResponse> myAttendance(
+    public ResponseEntity<List<AttendanceResponse> >myAttendance(
             HttpServletRequest servletRequest,
             @RequestParam LocalDate from,
             @RequestParam LocalDate to
     ) {
-        return service
+        return ResponseEntity.ok( service
                 .myAttendance(resolveEmployeeId(servletRequest), from, to)
                 .stream()
                 .map(this::map)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     // -------------------------

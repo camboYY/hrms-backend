@@ -2,20 +2,22 @@ package com.bbu.hrms.leave_request.dto;
 
 
 import com.bbu.hrms.leave_request.model.LeaveBalance;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
 public class LeaveBalanceDTO {
     private Long id;
 
-    @NotNull(message = "Employee ID is required")
     private Long employeeId;
 
-    @NotNull(message = "Leave type ID is required")
     private Long leaveTypeId;
+
+    private String leaveTypeName;
 
     private Integer allocatedDays;
     private Integer usedDays;
@@ -29,8 +31,10 @@ public class LeaveBalanceDTO {
                 .leaveTypeId(entity.getLeaveType().getId())
                 .allocatedDays(entity.getAllocatedDays())
                 .usedDays(entity.getUsedDays())
+                .leaveTypeName(entity.getLeaveType().getName())
                 .remainingDays(entity.getRemainingDays())
                 .employeeName(entity.getLeaveType().getName())
                 .build();
     }
+
 }

@@ -97,8 +97,8 @@ public class LeaveServiceImpl implements LeaveService {
 
         // Update balance
         int days = (int) (req.getEndDate().toEpochDay() - req.getStartDate().toEpochDay() + 1);
-        LeaveBalance bal = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(req.getEmployeeId(), req.getLeaveType().getId())
-                .orElseThrow(()-> new RuntimeException("Balance not found"));
+        LeaveBalance bal = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(req.getEmployeeId(), req.getLeaveType().getId());
+
         if(bal.getRemainingDays() < days) {
             throw new RuntimeException("Not enough leave balance");
         }
@@ -184,10 +184,9 @@ public class LeaveServiceImpl implements LeaveService {
     @Override
     public LeaveBalanceDTO getBalance(Long employeeId, Long leaveTypeId) {
         System.out.println("Getting leave balance for employee " + employeeId + " and leaveType " + leaveTypeId);
-        LeaveBalance bal = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(employeeId, leaveTypeId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Leave balance not found for employee " + employeeId + " and leaveType " + leaveTypeId));
-        return LeaveBalanceDTO.fromEntity(bal);
+       LeaveBalance balances = leaveBalanceRepo.findByEmployeeIdAndLeaveType_Id(employeeId, leaveTypeId);
+
+        return LeaveBalanceDTO.fromEntity(balances);
     }
 
     // --- Helpers ---
@@ -201,6 +200,7 @@ public class LeaveServiceImpl implements LeaveService {
         dto.setReason(req.getReason());
         dto.setStatus(req.getStatus());
         dto.setApproverId(req.getApproverId());
+        dto.setLeaveTypeName(req.getLeaveType().getName());
         return dto;
     }
 

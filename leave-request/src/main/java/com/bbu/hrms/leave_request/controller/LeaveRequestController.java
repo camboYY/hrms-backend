@@ -83,7 +83,7 @@ public class LeaveRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.allocateLeave(dto));
     }
 
-    @Operation(summary = "Get leave balance for employee and type")
+    @Operation(summary = "Get leave balance for an employee and type")
     @GetMapping("/balances")
     public ResponseEntity<LeaveBalanceDTO> getBalance(@RequestParam Long employeeId,
                                                       @RequestParam Long leaveTypeId) {

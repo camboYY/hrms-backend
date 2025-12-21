@@ -36,6 +36,16 @@ spring:
             - Path=/docs/auth
           filters:
             - SetPath=/v3/api-docs
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**, /users/**, /roles/**, /permissions/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
 
         # USER
         - id: user-docs
@@ -44,6 +54,16 @@ spring:
             - Path=/docs/user
           filters:
             - SetPath=/v3/api-docs
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/employees/**, /departments/**, /positions/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
 
         # LEAVE
         - id: leave-docs
@@ -52,6 +72,16 @@ spring:
             - Path=/docs/leave
           filters:
             - SetPath=/v3/api-docs
+        - id: leave-request-service
+          uri: http://localhost:8083
+          predicates:
+              - Path=/leaves/**, /leave-types/**, /leave-balances/**
+          filters:
+              - name: RequestRateLimiter
+                args:
+                  redis-rate-limiter.replenishRate: 5
+                  redis-rate-limiter.burstCapacity: 10
+                  key-resolver: "#{@ipKeyResolver}"
 
         # ATTENDANCE
         - id: attendance-docs
@@ -60,6 +90,16 @@ spring:
             - Path=/docs/attendance, /docs/attendance/**
           filters:
             - SetPath=/v3/api-docs
+        - id: attendance-service
+          uri: http://localhost:8084
+          predicates:
+              - Path=/attendances/**
+          filters:
+              - name: RequestRateLimiter
+                args:
+                  redis-rate-limiter.replenishRate: 5
+                  redis-rate-limiter.burstCapacity: 10
+                  key-resolver: "#{@ipKeyResolver}"
 
         # NOTIFICATION
         - id: notification-docs
@@ -68,7 +108,16 @@ spring:
             - Path=/docs/notification, /docs/notification/**
           filters:
             - SetPath=/v3/api-docs
-
+        - id: notification-service
+          uri: http://localhost:8085
+          predicates:
+              - Path=/notifications/**
+          filters:
+              - name: RequestRateLimiter
+                args:
+                  redis-rate-limiter.replenishRate: 5
+                  redis-rate-limiter.burstCapacity: 10
+                  key-resolver: "#{@ipKeyResolver}"
 
   security:
     oauth2:
