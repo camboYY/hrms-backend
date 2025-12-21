@@ -14,13 +14,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(
+                        auth -> auth.anyRequest().permitAll()
                 )
                 .httpBasic(httpBasic -> {}) // optional
                 .formLogin(form -> form.disable()); // DISABLE default /login

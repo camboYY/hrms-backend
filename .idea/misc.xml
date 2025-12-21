@@ -12,6 +12,8 @@
         <option value="$PROJECT_DIR$/hrms-common/pom.xml" />
         <option value="$PROJECT_DIR$/common/pom.xml" />
         <option value="$PROJECT_DIR$/attendance_service/pom.xml" />
+        <option value="$PROJECT_DIR$/paroll/pom.xml" />
+        <option value="$PROJECT_DIR$/payroll/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
