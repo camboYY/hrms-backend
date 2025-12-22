@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_payroll
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: hrms_payroll_db   # ✅ This auto-creates the DB
+    ports:
+      - "5436:5432"
+    networks:
+      - hrms-net
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+
+networks:
+  hrms-net:
+    driver: bridge

@@ -60,7 +60,7 @@ public class PayrollService {
     @Transactional(readOnly = true)
     public Payroll getPayslip(Long employeeId, LocalDate payrollMonth) {
         return payrollRepo
-                .findByEmployeeIdAndMonth(employeeId, payrollMonth)
+                .findByEmployeeIdAndPayrollMonth(employeeId, payrollMonth)
                 .orElseThrow(() -> new RuntimeException("Payslip not found"));
     }
 
