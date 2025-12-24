@@ -7,6 +7,8 @@ import com.bbu.hrms.payroll.entity.SalaryStructure;
 import com.bbu.hrms.payroll.repository.PayrollRepository;
 import com.bbu.hrms.payroll.repository.SalaryStructureRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,5 +113,13 @@ public class PayrollService {
 
         return payrollRepo.save(payroll);
     }
+
+    public Page<Payroll> getPayrollsByMonth(
+            LocalDate payrollMonth,
+            Pageable pageable
+    ) {
+        return payrollRepo.findAllByPayrollMonth(payrollMonth, pageable);
+    }
+
 }
 

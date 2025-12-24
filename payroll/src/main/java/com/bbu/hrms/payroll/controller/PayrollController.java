@@ -9,8 +9,13 @@ import com.bbu.hrms.payroll.service.PayrollService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,4 +61,26 @@ public class PayrollController {
         Payroll paidPayroll = payrollService.processPayroll(payrollId);
         return ResponseEntity.ok(PayrollMapper.toDTO(paidPayroll));
     }
+
+    @Operation(summary = "Get payrolls by month (paginated)")
+    @GetMapping
+    public ResponseEntity<Page<PayrollDTO>> getPayrollsByMonth(
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @RequestParam LocalDate month,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("employeeId").ascending()
+        );
+
+        Page<PayrollDTO> payrolls = payrollService
+                .getPayrollsByMonth(month, pageable)
+                .map(PayrollMapper::toDTO);
+
+        return ResponseEntity.ok(payrolls);
+    }
+
 }
